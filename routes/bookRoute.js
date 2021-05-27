@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+/* const multer = require("multer"); */
+/* const path = require("path"); */
+/* const fs = require("fs"); */
 const Author = require("../models/authors");
 const Book = require("../models/books");
 const { query } = require("express");
-const uploadPath = path.join("public", Book.imagePath);
+/* const uploadPath = path.join("public", Book.imagePath); */
 const imgMimeTyes = ["image/jpeg", "image/png", "image/gif"];
-const storage = multer.diskStorage({
+/* const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, uploadPath);
     },
@@ -24,7 +24,7 @@ const upload = multer({
     fileFilter: (req, file, cb) => {
         cb(null, imgMimeTyes.includes(file.mimetype));
     },
-});
+}); */
 // All books
 router.get("/", async (req, res) => {
     let query = Book.find();
@@ -53,22 +53,22 @@ router.get("/", async (req, res) => {
 router.get("/new", async (req, res) => {
     renderNewPage(res, new Book());
 });
-router.post("/", upload.single("cover"), async (req, res) => {
+router.post("/", async (req, res) => {
     const fileName = req.file != null ? req.file.filename : null;
     const book = new Book({
         title: req.body.title,
         author: req.body.author,
         publishDate: new Date(req.body.publishDate),
         pageCount: req.body.pageCount,
-        coverImage: fileName,
         description: req.body.description,
     });
-
+    /* console.log(req.body.cover); */
+    saveCover(book, req.body.cover);
     try {
         const newBook = await book.save();
         res.redirect("/books");
     } catch (error) {
-        if (book.coverImage != null) removeBookCover(book.coverImage);
+        /* if (book.coverImage != null) removeBookCover(book.coverImage); */
         renderNewPage(res, book, true);
     }
 });
@@ -86,10 +86,18 @@ async function renderNewPage(res, book, hasError = false) {
         res.redirect("/books");
     }
 }
-function removeBookCover(fileName) {
+/* function removeBookCover(fileName) {
     fs.unlink(path.join(uploadPath, fileName), (err) => {
         if (err) console.log(err);
     });
+} */
+function saveCover(book, coverEncoded) {
+    if (coverEncoded == null) return;
+    const cover = JSON.parse(coverEncoded);
+    /* console.log("cover in saveCover : ", cover); */
+    if (cover != null && imgMimeTyes.includes(cover.type)) {
+        book.coverImage = new Buffer.from(cover.data, "base64");
+        book.coverImageType = cover.type;
+    }
 }
-
 module.exports = router;
