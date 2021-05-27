@@ -7,6 +7,7 @@ const port = process.env.PORT || 3000;
 // Require Router
 const indexRoute = require("./routes/indexRoute");
 const authorRoute = require("./routes/authorRoute");
+const bookRoute = require("./routes/bookRoute");
 // Set up Views, Layouts
 app.use(express.static("./public"));
 app.set("view engine", "ejs");
@@ -21,7 +22,7 @@ app.use(express.urlencoded());
 // Set up Router
 app.use("/", indexRoute);
 app.use("/authors", authorRoute);
-
+app.use("/books", bookRoute);
 // Set up DB
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
