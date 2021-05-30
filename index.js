@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const expressLayouts = require("express-ejs-layouts");
 const mongoose = require("mongoose");
+const methodOverride = require("method-override");
 require("dotenv").config();
 const port = process.env.PORT || 3000;
 // Require Router
@@ -9,6 +10,7 @@ const indexRoute = require("./routes/indexRoute");
 const authorRoute = require("./routes/authorRoute");
 const bookRoute = require("./routes/bookRoute");
 // Set up Views, Layouts
+app.use(methodOverride("_method"));
 app.use(express.static("./public"));
 app.set("view engine", "ejs");
 app.set("views", __dirname + "/views/");
